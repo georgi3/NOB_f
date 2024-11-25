@@ -1,4 +1,4 @@
-import React, { SVGProps} from 'react'
+import React, {SVGProps, useEffect, useState} from 'react'
 import { Link } from "react-router-dom";
 import {JSX} from 'react/jsx-runtime'
 import img1 from '../assets/1.webp'
@@ -8,14 +8,7 @@ import img4 from '../assets/4.webp'
 import img5 from '../assets/5.webp'
 import video from "../assets/video.mp4"
 
-const services = [
-    { name: "Haircut", description: "Professional grooming service for hair trimming, cutting, and styling.", price: "$33" },
-    { name: "Haircut Kids", description: "Fun and safe haircuts for children with experienced stylists.", price: "$23" },
-    { name: "Haircut Long Hair", description: "Specialized hair care for trimming, styling, and maintaining long hair.", price: "$37" },
-    { name: "Haircut & Beard", description: "Expert grooming service for haircuts and beard trims and shaping.", price: "$56" },
-    { name: "Beard", description: "Expert trimming, shaping, and grooming for a well-maintained beard.", price: "$23" },
-    { name: "Full Set", description: "Full-service haircut and beard trim with rejuvenating face mask treatment.", price: "$65" }
-];
+
 const openingHours: { day: string, hours: string }[] = [
     { day: "Monday", hours: "11 am - 6 pm" },
     { day: "Tuesday", hours: "10 am - 8 pm" },
@@ -25,7 +18,6 @@ const openingHours: { day: string, hours: string }[] = [
     { day: "Saturday", hours: "10 am - 6 pm" },
     { day: "Sunday", hours: "11 am - 5 pm" },
 ];
-
 const footerNavigation = {
     openingHours: openingHours,
     social: [
@@ -44,8 +36,26 @@ const footerNavigation = {
         },
     ],
 }
-
+async function fetchServices() {
+    const response = await fetch(`http://127.0.0.1:8000/api/services`);
+    return await response.json();
+}
+type ServicesI = {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+    duration: string;
+};
 export default function LandingPage() {
+    const [services, setServices] = useState<ServicesI[]>();
+
+    useEffect(() => {
+        (async() => {
+            const data = await fetchServices();
+            setServices(data);
+        })()
+    }, []);
     return (
         <div>
             <main className="isolate">
@@ -188,15 +198,15 @@ export default function LandingPage() {
                             </h2>
                         </div>
                         <dl className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 text-base/7 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                            {services.map((service) => (
-                                <Link key={service.name}
-                                   to='/booking'
+                            {services && services.map((service) => (
+                                <Link key={service?.id}
+                                    to={`/booking?service_id=${service.id}`}
                                    className="p-4 text-white hover:bg-white hover:text-black">
                                     <p className="font-semibold flex justify-between">
-                                        <span>{service.name}</span>
-                                        <span>{service.price}</span>
+                                        <span>{service?.name}</span>
+                                        <span>{service?.price}</span>
                                     </p>
-                                    <dd className="mt-1">{service.description}</dd>
+                                    <dd className="mt-1">{service?.description}</dd>
                                 </Link>
                             ))}
                         </dl>

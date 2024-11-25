@@ -4,6 +4,7 @@ import BookingSteps from "./BookingSteps";
 import ChooseDateTime from "./ChooseDateTime";
 import PersonalInfo from "./PersonalInfo";
 import Confirmation from './Confirmation';
+import {useLocation} from "react-router-dom";
 const steps = [
     { id: 1, name: 'Choose Barber', href: '#', status: 'complete' },
     { id: 2, name: 'Choose Date & Time', href: '#', status: 'current' },
@@ -13,11 +14,13 @@ const steps = [
 
 export default function Booking() {
     const [currentStep, setCurrentStep] = useState(1);
-    const [chosenBarber, setChosenBarber] = useState('');
+    const [chosenBarber, setChosenBarber] = useState<string>('');
     const [chosenDate, setChosenDate] = useState<Date | undefined>();
     const [chosenTime, setChosenTime] = useState('');
     const [userDetails, setUserDetails] = useState('');
-
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const serviceId = queryParams.get('service_id') || '';
     const goToNextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length));
     // const goToPreviousStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
     const handleChooseBarber = (barber: string) => {
@@ -36,9 +39,10 @@ export default function Booking() {
             <div className="px-14 py-4">
                 <BookingSteps active={currentStep} setActive={setCurrentStep}  />
             </div>
-            {/* Render based on the current step */}
             {currentStep === 1 && <ChooseBarber onSelect={handleChooseBarber} />}
             {currentStep === 2 && <ChooseDateTime
+                barberId={chosenBarber}
+                serviceId={serviceId}
                 chosenDate={chosenDate}
                 setChosenDate={setChosenDate}
                 selectedTime={chosenTime}
