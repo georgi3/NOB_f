@@ -39,7 +39,10 @@ export default function Booking() {
             <div className="px-14 py-4">
                 <BookingSteps active={currentStep} setActive={setCurrentStep}  />
             </div>
-            {currentStep === 1 && <ChooseBarber onSelect={handleChooseBarber} />}
+            {currentStep === 1 && <ChooseBarber
+                onSelect={handleChooseBarber}
+                serviceId={serviceId}
+            />}
             {currentStep === 2 && <ChooseDateTime
                 barberId={chosenBarber}
                 serviceId={serviceId}

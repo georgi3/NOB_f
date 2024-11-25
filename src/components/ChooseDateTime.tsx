@@ -1,7 +1,6 @@
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import React, {useEffect, useState} from "react";
-import {useLocation} from "react-router-dom";
 
 const timeSlots = [
     "10:00 AM",
@@ -53,8 +52,8 @@ async function fetchBlockedDates(barberId: string, serviceId: string){
     const response = await  fetch(`http://127.0.0.1:8000/api/blocked-dates?barber_id=${barberId}&serviceId=${serviceId}`)
     return await response.json();
 }
-async function  fetchAvailableTimeSlots(date: Date){
-    const response = await fetch(`http://127.0.0.1:8000/api/available-time-slots?date=${toDateString(date)}`)
+async function  fetchAvailableTimeSlots(date: Date, barberId: string, serviceId: string){
+    const response = await fetch(`http://127.0.0.1:8000/api/available-time-slots?date=${toDateString(date)}&service_id=${serviceId}&barber_id=${barberId}`)
     return await response.json();
 }
 type ChoseDateTimeProps = {
@@ -83,7 +82,7 @@ export default function ChooseDateTime({chosenDate, setChosenDate, selectedTime,
     useEffect(() => {
         (async () => {
             if (chosenDate){
-                const data = await fetchAvailableTimeSlots(chosenDate);
+                const data = await fetchAvailableTimeSlots(chosenDate, barberId, serviceId);
                 setAvailableTimeSlots(data);
             }
         })()
@@ -124,10 +123,12 @@ export default function ChooseDateTime({chosenDate, setChosenDate, selectedTime,
                         <div className="relative w-11/12">
                             <div className="bg-black opacity-90 inset-0 absolute"/>
                             <div className="relative">
-                                <div className="flex items-center justify-center overflow-y-scroll h-96">
+                                <div className=" justify-center overflow-y-scroll h-96">
                                     <div className="py-14 px-4">
                                         <div className="grid grid-cols-4 gap-4"> {/* Add overflow-y-scroll and a height */}
-                                            {timeSlots.map((time, index) => (
+                                            {(availableTimeSlots && availableTimeSlots?.length > 0)
+                                                ? (
+                                                    availableTimeSlots.map((time, index) => (
                                                         <div
                                                             key={index}
                                                             onClick={handleSelectTime(time)}
@@ -135,7 +136,12 @@ export default function ChooseDateTime({chosenDate, setChosenDate, selectedTime,
                                                         >
                                                             {time}
                                                         </div>
-                                                ))}
+                                                )))
+                                                :
+                                                (
+                                                    <div className={'flex justify-center items-center'}><p className={'text-center '}>No availabilities for the day.</p></div>
+                                                )
+                                            }
                                         </div>
                                     </div>
                                 </div>

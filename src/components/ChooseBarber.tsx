@@ -1,5 +1,3 @@
-import {Link} from "react-router-dom";
-import { useLocation } from 'react-router-dom';
 import {useEffect, useState} from "react";
 
 async function fetchQualifiedBarbers(serviceId: string) {
@@ -12,10 +10,7 @@ type QualifiedBarbersI = {
     profile_image: string;
     position: string;
 }
-export default function ChooseBarber({onSelect}: {onSelect: (selected: string) => void}) {
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const serviceId = queryParams.get('service_id') || '';
+export default function ChooseBarber({onSelect, serviceId}: {serviceId: string, onSelect: (selected: string) => void}) {
     const [qualifiedBarbers, setQualifiedBarbers] = useState<QualifiedBarbersI[]>();
 
     useEffect(() => {
